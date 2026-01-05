@@ -116,7 +116,7 @@ function App() {
     <div>
       <header className="app-header">
         <div className="header-left">
-          <h1>Accounts</h1>
+          <h1>Account</h1>
           <p className="subtitle">Manage your connected Discord accounts</p>
         </div>
         <div className="header-right">
@@ -203,11 +203,11 @@ function App() {
                           <span className="badge valid">Valid</span>
                         </div>
                         <ul className="list_group">
-                          <li className="list_item"><strong>Token:</strong> {item.token}</li>
-                          <li className="list_item"><strong>Email:</strong> {item.result.email}</li>
-                          <li className="list_item"><strong>Verified:</strong> {item.result.verified}</li>
-                          <li className="list_item"><strong>Locale:</strong> {item.result.locale}</li>
-                          <li className="list_item"><strong>Phone:</strong> {item.result.phone}</li>
+                          <li className="list_item token"><strong>Token:</strong> <span className="list_value">{item.token}</span></li>
+                          <li className="list_item"><strong>Email:</strong> <span className="list_value">{item.result.email}</span></li>
+                          <li className="list_item"><strong>Verified:</strong> <span className="list_value">{item.result.verified}</span></li>
+                          <li className="list_item"><strong>Locale:</strong> <span className="list_value">{item.result.locale}</span></li>
+                          <li className="list_item"><strong>Phone:</strong> <span className="list_value">{item.result.phone}</span></li>
                         </ul>
                         <div className="card-buttons">
                           <button className="default_button" onClick={() => copySingleResult(item.result)}>Copy</button>

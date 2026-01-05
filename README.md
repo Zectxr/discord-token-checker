@@ -1,4 +1,4 @@
-# 🔍 Discord Token Checker
+# 🔍 tokencord
 
 <div align="center">
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
@@ -14,7 +14,7 @@
 
 ## ✨ Overview
 
-**Discord Token Checker** is a modern, lightweight web application built with React that allows you to verify Discord account tokens and view detailed account information. Perfect for developers, security researchers, and Discord enthusiasts who need to validate tokens quickly and efficiently.
+**tokencord** is a modern, lightweight web application built with React that allows you to verify Discord account tokens and view detailed account information. Perfect for developers, security researchers, and Discord enthusiasts who need to validate tokens quickly and efficiently.
 
 ### 🚀 Key Features
 
