@@ -224,8 +224,8 @@ function App() {
       </main>
 
       <footer>
-        <span className="a_container">[<a href="https://www.github.com/xnacly">Github</a>]</span>
-        <span className="a_container"> [<a href="https://www.github.com/xnacly/tokenchecker-website">Repo</a>] </span>
+        <span className="a_container">[<a href="https://github.com/Zectxr">Github</a>]</span>
+        <span className="a_container"> [<a href="https://github.com/Zectxr/discord-token-checker">Repo</a>] </span>
       </footer>
     </div>
   );
