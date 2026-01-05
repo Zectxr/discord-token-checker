@@ -6,10 +6,10 @@
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
   <img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord" />
   <br>
-  <img src="https://img.shields.io/github/stars/xNaCly/tokenchecker-website?style=social" alt="GitHub stars" />
-  <img src="https://img.shields.io/github/forks/xNaCly/tokenchecker-website?style=social" alt="GitHub forks" />
-  <img src="https://img.shields.io/github/issues/xNaCly/tokenchecker-website" alt="GitHub issues" />
-  <img src="https://img.shields.io/github/license/xNaCly/tokenchecker-website" alt="License" />
+  <img src="https://img.shields.io/github/stars/Zectxr/discord-token-checker?style=social" alt="GitHub stars" />
+  <img src="https://img.shields.io/github/forks/Zectxr/discord-token-checker?style=social" alt="GitHub forks" />
+  <img src="https://img.shields.io/github/issues/Zectxr/discord-token-checker" alt="GitHub issues" />
+  <img src="https://img.shields.io/github/license/Zectxr/discord-token-checker" alt="License" />
 </div>
 
 ## ✨ Overview
@@ -50,8 +50,8 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/xNaCly/tokenchecker-website.git
-   cd tokenchecker-website
+   git clone https://github.com/Zectxr/discord-token-checker.git
+   cd discord-token-checker
    ```
 
 2. **Install dependencies**
@@ -104,7 +104,7 @@ YOUR_DISCORD_TOKEN_HERE
 
 ### Project Structure
 ```
-tokenchecker-website/
+discord-token-checker/
 ├── src/
 │   ├── App.jsx          # Main application component
 │   ├── main.jsx         # React entry point
@@ -153,14 +153,14 @@ This tool is intended for educational and legitimate purposes only. Users are re
 
 ## 🙏 Acknowledgments
 
-- Original concept by [xNaCly](https://github.com/xnacly)
 - Built with ❤️ using React and Vite
 - Discord API for account validation
+- Inspired by the token checker community
 
 ## 📞 Support
 
-- 🐛 Found a bug? [Open an issue](https://github.com/xNaCly/tokenchecker-website/issues)
-- 💡 Have a suggestion? [Start a discussion](https://github.com/xNaCly/tokenchecker-website/discussions)
+- 🐛 Found a bug? [Open an issue](https://github.com/Zectxr/discord-token-checker/issues)
+- 💡 Have a suggestion? [Start a discussion](https://github.com/Zectxr/discord-token-checker/discussions)
 - ⭐ Show your support by starring this repo!
 
 ---
@@ -168,7 +168,7 @@ This tool is intended for educational and legitimate purposes only. Users are re
 <div align="center">
   <p>Made with ❤️ for the Discord community</p>
   <p>
-    <a href="https://github.com/xNaCly">GitHub</a> •
+    <a href="https://github.com/Zectxr">GitHub</a> •
     <a href="https://discord.gg">Discord</a>
   </p>
 </div>
