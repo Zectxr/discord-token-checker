@@ -88,6 +88,8 @@ npm run preview
 YOUR_DISCORD_TOKEN_HERE
 ```
 
+**Note**: Replace `YOUR_DISCORD_TOKEN_HERE` with your actual Discord token. Tokens typically look like: `MXXXXXXXXXXXXXXXXXXXXXXX.XXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXX`
+
 ## 🏗️ Architecture
 
 ### Tech Stack
