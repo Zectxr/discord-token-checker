@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 
 function App() {
   const [tokenInput, setTokenInput] = useState('');
+  const [hiddenTokens, setHiddenTokens] = useState([]);
   const [results, setResults] = useState([]);
   const [validCount, setValidCount] = useState(0);
   const [invalidCount, setInvalidCount] = useState(0);
 
   const checkTokens = async () => {
-    const tokens = tokenInput.split('\n').map(t => t.trim()).filter(t => t);
+    const tokens = hiddenTokens.length > 0
+      ? hiddenTokens
+      : tokenInput.split('\n').map(t => t.trim()).filter(t => t);
+
     if (tokens.length === 0) {
       setResults([{ type: 'alert', message: 'No tokens provided' }]);
       return;
@@ -24,6 +28,9 @@ function App() {
       setResults([...newResults]); // Update results incrementally
       updateCounts(newResults); // Update counts after each check
     }
+    // Clear hidden tokens after checking
+    setHiddenTokens([]);
+    setTokenInput('');
   };
 
   const checkSingleToken = async (token) => {
@@ -86,7 +93,10 @@ function App() {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setTokenInput(e.target.result);
+        const fileContent = e.target.result;
+        const tokens = fileContent.split('\n').map(t => t.trim()).filter(t => t);
+        setHiddenTokens(tokens);
+        setTokenInput(`${tokens.length} tokens loaded from file (hidden for security)`);
       };
       reader.readAsText(file);
     }
@@ -123,7 +133,10 @@ function App() {
             className="input_main"
             placeholder="Paste tokens here, one per line"
             value={tokenInput}
-            onChange={(e) => setTokenInput(e.target.value)}
+            onChange={(e) => {
+              setTokenInput(e.target.value);
+              setHiddenTokens([]); // Clear hidden tokens when user types
+            }}
           />
           <div className="buttons">
             <button className="default_button" onClick={checkTokens}>Check Tokens</button>

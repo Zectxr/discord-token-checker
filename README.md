@@ -29,7 +29,8 @@
 - **📱 Responsive Design**: Beautiful, modern UI that works on all devices
 - **⚡ Fast & Lightweight**: Built with Vite for lightning-fast performance
 - **🔒 Secure**: Direct API calls to Discord with no data storage
-- **📁 File Upload**: Load tokens from text files for bulk checking
+- **� Secure File Loading**: Load tokens from files without displaying them in the interface
+- **�📁 File Upload**: Load tokens from text files for bulk checking
 - **🗑️ Easy Management**: Delete individual results with one click
 - **📋 Copy to Clipboard**: Copy account data with a single button
 
@@ -78,10 +79,13 @@ npm run preview
 ## 📖 Usage
 
 1. **Enter Tokens**: Paste your Discord tokens in the text area, one per line
-2. **Load from File**: Or upload a `.txt` file containing tokens
+2. **Load from File**: Upload a `.txt` file containing tokens (tokens remain hidden for security)
 3. **Check Tokens**: Click the "Check Tokens" button
 4. **View Results**: Watch as results appear in real-time
 5. **Manage Results**: Copy account data or remove individual entries
+
+### Security Note
+When loading tokens from a file, they are processed securely without being displayed in the text area, protecting your sensitive information from accidental exposure.
 
 ### Token Format
 ```
