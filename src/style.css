@@ -1,0 +1,396 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+:root {
+  --primary: #5865f2;
+  --primary-hover: #4752c4;
+  --success: #57f287;
+  --danger: #ed4245;
+  --warning: #fee75c;
+  --background: #36393f;
+  --background-secondary: #2f3136;
+  --background-tertiary: #202225;
+  --text-primary: #ffffff;
+  --text-secondary: #b9bbbe;
+  --text-muted: #72767d;
+  --border: #202225;
+  --border-hover: #40444b;
+  --shadow: rgba(0, 0, 0, 0.2);
+  --radius: 8px;
+  --radius-large: 12px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, var(--background) 0%, var(--background-tertiary) 100%);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--background-secondary);
+  border-radius: var(--radius-large);
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+.header-left h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--primary);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.header-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: var(--background-tertiary);
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.stat strong {
+  margin-right: 0.5rem;
+}
+
+#validCount { color: var(--success); }
+#invalidCount { color: var(--danger); }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.main {
+  background: var(--background-secondary);
+  padding: 2rem;
+  border-radius: var(--radius-large);
+  box-shadow: 0 4px 12px var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.input_main {
+  width: 100%;
+  min-height: 120px;
+  padding: 1rem;
+  background: var(--background-tertiary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.input_main:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.1);
+}
+
+.buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.default_button {
+  padding: 0.75rem 1.5rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.default_button:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
+}
+
+.accounts-area {
+  margin-top: 2rem;
+}
+
+.results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.account-card {
+  background: var(--background-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  position: relative;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.account-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 4px 16px var(--shadow);
+  transform: translateY(-2px);
+}
+
+.status-dot {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--background-secondary);
+}
+
+.status-online {
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success);
+}
+
+.status-offline {
+  background: var(--danger);
+  box-shadow: 0 0 8px var(--danger);
+}
+
+.account-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.account-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  flex-shrink: 0;
+}
+
+.account-info {
+  flex: 1;
+}
+
+.account-username {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.account-sub {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.badges {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge.status {
+  background: var(--background-tertiary);
+  color: var(--text-muted);
+}
+
+.badge.valid {
+  background: rgba(87, 242, 135, 0.1);
+  color: var(--success);
+}
+
+.list_group {
+  list-style: none;
+  margin-bottom: 1rem;
+}
+
+.list_item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list_item:last-child {
+  border-bottom: none;
+}
+
+.list_item strong {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.card-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.card-buttons button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.default_button {
+  background: var(--primary);
+  color: white;
+}
+
+.default_button:hover {
+  background: var(--primary-hover);
+}
+
+.delete-btn {
+  background: transparent;
+  color: var(--danger);
+  font-size: 1.2rem;
+  padding: 0.5rem;
+}
+
+.delete-btn:hover {
+  background: rgba(237, 66, 69, 0.1);
+}
+
+.alert {
+  color: var(--danger);
+  font-weight: 500;
+  padding: 0.5rem;
+  background: rgba(237, 66, 69, 0.1);
+  border-radius: var(--radius);
+  margin-top: 0.5rem;
+}
+
+.alert-card {
+  background: var(--background-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.no-results {
+  background: var(--background-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+footer {
+  text-align: center;
+  margin-top: 3rem;
+  padding: 1rem;
+  color: var(--text-muted);
+}
+
+.a_container {
+  margin: 0 0.5rem;
+}
+
+.a_container a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.a_container a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  body {
+    padding: 1rem;
+  }
+
+  .app-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .header-stats {
+    justify-content: center;
+  }
+
+  .results {
+    grid-template-columns: 1fr;
+  }
+
+  .buttons {
+    justify-content: center;
+  }
+
+  .main {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .account-top {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .card-buttons {
+    flex-direction: column;
+  }
+
+  .buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .default_button {
+    justify-content: center;
+  }
+}
