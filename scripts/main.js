@@ -3,7 +3,7 @@ async function checkTokens() {
 	var token_input = document.getElementsByClassName("input_main")[0];
 	var tokens = token_input.value.split('\n').map(t => t.trim()).filter(t => t);
 	var resultsDiv = document.getElementById("results");
-	resultsDiv.innerHTML = ''; // Clear previous results
+	resultsDiv.innerHTML = '';
 	updateCounts();
 
 	if (tokens.length === 0) {
@@ -19,23 +19,6 @@ async function checkTokens() {
 }
 
 async function checkSingleToken(token) {
-	/*
-	fetch @me object from discord:
-	{
-			"id": "",
-			"username": "",
-			"avatar": "",
-			"discriminator": "",
-			"public_flags": 256,
-			"flags": 256,
-			"email": null,
-			"verified": false,
-			"locale": "",
-			"nsfw_allowed": true,
-			"mfa_enabled": false,
-			"phone": null
-		}
-	*/
 	let response;
 	try {
 		response = await fetch("https://discordapp.com/api/v6/users/@me", {
@@ -47,16 +30,9 @@ async function checkSingleToken(token) {
 		return { error: `Request failed: ${e}` };
 	}
 
-	/*
-	if token is invalid => means if no username returned
-	*/
 	if (!response.username) {
 		return { invalid: true };
 	}
-
-	/*
-	if response.status !== 200 -> account is phoneblocked
-	*/
 
 	let phoneBlockCheck;
 	try {
@@ -97,7 +73,6 @@ function displayResult(token, result) {
 	var tokenDiv = document.createElement("div");
 	tokenDiv.className = "account-card";
 
-	// status dot
 	var statusDot = document.createElement('div');
 	statusDot.className = 'status-dot ' + (result.invalid || result.error ? 'status-offline' : 'status-online');
 	tokenDiv.appendChild(statusDot);
@@ -117,7 +92,6 @@ function displayResult(token, result) {
 			<span class="alert">${result.error}</span>
 		`;
 	} else if (result.invalid) {
-		// show invalid card
 		tokenDiv.dataset.status = 'invalid';
 		tokenDiv.innerHTML += `
 			<div class="account-top">
@@ -133,7 +107,6 @@ function displayResult(token, result) {
 			</div>
 		`;
 	} else {
-		// valid token card
 		tokenDiv.dataset.status = 'valid';
 		tokenDiv.innerHTML += `
 			<div class="account-top">
@@ -163,7 +136,6 @@ function displayResult(token, result) {
 
 	resultsDiv.appendChild(tokenDiv);
 
-	// attach delete handler
 	var deleteBtn = tokenDiv.querySelector('.delete-btn');
 	if (deleteBtn) {
 		deleteBtn.addEventListener('click', function () {
