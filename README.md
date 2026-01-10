@@ -168,7 +168,7 @@ Join our Discord community for support, feature discussions, and collaboration:
 
 [![Join our Discord](https://img.shields.io/badge/Join%20our-Discord-7289da?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/YOUR_INVITE_CODE)
 
-**[discord.gg/YOUR_INVITE_CODE](https://discord.gg/YOUR_INVITE_CODE)**
+**[discord.gg/XyhphaNetwork]([https://discord.gg/YOUR_INVITE_CODE](https://discord.gg/p6YTYuKpaH))**
 
 </div>
 
