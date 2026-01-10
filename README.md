@@ -1,4 +1,4 @@
-# tokencord
+# Tokencord
 
 Discord token checker built with React and Vite. Validates multiple tokens, surfaces account details, and keeps sensitive values hidden by default.
 
