@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { securityDetection } from './utils/securityDetection';
+import { crypto } from './utils/cryptoUtilities';
+import { runtimeIntegrity, behaviorAnalysis } from './utils/runtimeIntegrity';
+import { securityConfig, SecureFetch, SecurityMiddleware } from './utils/securityConfig';
 
 function App() {
   const [tokenInput, setTokenInput] = useState('');
@@ -6,6 +10,52 @@ function App() {
   const [results, setResults] = useState([]);
   const [validCount, setValidCount] = useState(0);
   const [invalidCount, setInvalidCount] = useState(0);
+  const [securityWarning, setSecurityWarning] = useState(null);
+  const [secureFetch] = useState(() => new SecureFetch(new SecurityMiddleware()));
+
+  // Initialize security on mount
+  useEffect(() => {
+    const initSecurity = async () => {
+      // Initialize runtime protection
+      runtimeIntegrity.initialize();
+      behaviorAnalysis.startMonitoring();
+
+      // Run security audit
+      const audit = securityDetection.runFullSecurityAudit();
+      const report = securityDetection.getSecurityReport(audit);
+
+      // Log audit results
+      console.log('[Security Audit]', report);
+
+      // Check if suspicious (only in production)
+      const isProduction = process.env.NODE_ENV === 'production';
+      if (audit.flagged && isProduction) {
+        setSecurityWarning({
+          level: 'warning',
+          message: 'Suspicious environment detected. Some features may be restricted.',
+          details: audit.checks,
+        });
+        
+        if (securityConfig.behavior.logViolations) {
+          console.warn('Security violations detected:', audit);
+        }
+      } else if (securityConfig.development.logAllDetections) {
+        console.debug('[Dev Mode] Security audit details logged above');
+      }
+
+      // Enforce HTTPS in production
+      if (!securityConfig.development.allowLocalhost && window.location.protocol !== 'https:') {
+        console.warn('Non-HTTPS connection detected');
+      }
+    };
+
+    initSecurity();
+
+    // Cleanup
+    return () => {
+      runtimeIntegrity.shutdown();
+    };
+  }, []);
 
   const checkTokens = async () => {
     const tokens = hiddenTokens.length > 0
@@ -34,11 +84,19 @@ function App() {
   };
 
   const checkSingleToken = async (token) => {
+    // Rate limiting: add random delay to prevent rapid automation
+    await new Promise(resolve => 
+      setTimeout(resolve, Math.random() * 500 + 100)
+    );
+
     let response;
     try {
-      response = await fetch("https://discordapp.com/api/v6/users/@me", {
+      // Discord API CORS restrictions - minimal headers needed
+      response = await fetch("https://discord.com/api/v10/users/@me", {
         method: "GET",
-        headers: { Authorization: token },
+        headers: { 
+          Authorization: token,
+        },
       });
       response = await response.json();
     } catch (e) {
@@ -51,9 +109,11 @@ function App() {
 
     let phoneBlockCheck;
     try {
-      phoneBlockCheck = await fetch("https://discordapp.com/api/v6/users/@me/library", {
+      phoneBlockCheck = await fetch("https://discord.com/api/v10/users/@me/library", {
         method: "GET",
-        headers: { Authorization: token },
+        headers: { 
+          Authorization: token,
+        },
       });
       phoneBlockCheck = phoneBlockCheck.status;
     } catch (e) {
@@ -114,6 +174,24 @@ function App() {
 
   return (
     <div>
+      {securityWarning && (
+        <div className="security-warning" style={{
+          backgroundColor: '#fff3cd',
+          border: '1px solid #ffc107',
+          padding: '12px',
+          margin: '10px 0',
+          borderRadius: '4px',
+          color: '#856404',
+        }}>
+          <strong>⚠️ Security Notice:</strong> {securityWarning.message}
+          <details style={{ fontSize: '0.9em', marginTop: '8px' }}>
+            <summary>Details</summary>
+            <pre style={{ fontSize: '0.85em', overflow: 'auto' }}>
+              {JSON.stringify(securityWarning.details, null, 2)}
+            </pre>
+          </details>
+        </div>
+      )}
       <header className="app-header">
         <div className="header-left">
           <h1>Account</h1>
