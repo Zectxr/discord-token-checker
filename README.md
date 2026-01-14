@@ -1,6 +1,6 @@
 <div align="center">
 
-# Discord Token Checker
+# Discord Token Checker 🔐
 
 **Validate Discord tokens instantly with a modern, secure web interface**
 
@@ -8,10 +8,11 @@
 [![GitHub forks](https://img.shields.io/github/forks/Zectxr/discord-token-checker?style=flat-square)](https://github.com/Zectxr/discord-token-checker/network)
 [![GitHub license](https://img.shields.io/github/license/Zectxr/discord-token-checker?style=flat-square)](https://github.com/Zectxr/discord-token-checker/blob/main/LICENSE.txt)
 [![GitHub last commit](https://img.shields.io/github/last-commit/Zectxr/discord-token-checker?style=flat-square)](https://github.com/Zectxr/discord-token-checker/commits/main)
-[![Discord](https://img.shields.io/discord/YOUR_DISCORD_SERVER_ID?color=7289da&label=Discord&logo=discord&logoColor=white&style=flat-square)](https://discord.gg/YOUR_INVITE_CODE)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)](https://github.com/Zectxr/discord-token-checker/releases)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Server-7289da?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/p6YTYuKpaH)
+[![Version](https://img.shields.io/badge/version-2.0.0--secure-brightgreen?style=flat-square)](https://github.com/Zectxr/discord-token-checker/releases)
+[![Security](https://img.shields.io/badge/security-enterprise%20grade-brightgreen?style=flat-square)](#security)
 
-[Features](#features) • [Installation](#installation) • [Usage](#usage) • [Documentation](#documentation) • [Community](#community) • [Contributing](#contributing)
+[Features](#features) • [Security](#security) • [Installation](#installation) • [Usage](#usage) • [Documentation](#documentation) • [Community](#community) • [Contributing](#contributing)
 
 </div>
 
@@ -19,20 +20,33 @@
 
 ## Overview
 
-Discord Token Checker is a production-ready, client-side web application for validating Discord account tokens and retrieving detailed account information. Built with React and Vite, it provides real-time validation, comprehensive account details, and secure token processing—all within your browser.
+Discord Token Checker is an **enterprise-grade, production-ready** web application for validating Discord account tokens securely. Built with React and Vite, it implements advanced security patterns including HMAC-signed requests, replay attack prevention, rate limiting, and backend-only token validation.
 
-Trusted by developers and security researchers for token validation workflows.
+**Version 2.0** introduces comprehensive security architecture protecting against MITM, tampering, replay attacks, frontend bypass, and automated abuse.
+
+Trusted by developers and security researchers for secure token validation workflows.
 
 ## Features
 
+### Core Functionality
 - **Instant Token Validation** — Verify Discord tokens against the official API in real-time
 - **Comprehensive Account Details** — View username, email, verification status, phone lock status, ID, locale, and avatar
 - **Batch Processing** — Check multiple tokens simultaneously with live progress updates
 - **Secure File Upload** — Load tokens from `.txt` files without exposing them in the UI
-- **Zero Data Storage** — All processing happens client-side; no tokens are stored or transmitted to external servers
 - **Modern Interface** — Clean, responsive design built for efficiency and usability
-- **One-Click Actions** — Copy account data or remove results with single-click controls
 - **Lightning Fast** — Powered by Vite for instant hot module replacement and optimized builds
+
+### Security Features 🔐
+- **HTTPS-Only Communication** — TLS 1.3 with HSTS enforcement (no HTTP fallback)
+- **HMAC-Signed Requests** — Tamper detection via SHA-256 signatures
+- **Replay Attack Prevention** — Timestamp + nonce-based replay protection
+- **Backend-Only Validation** — All token checks performed on secure server
+- **Multi-Layer Rate Limiting** — IP, session, and device fingerprint based limits
+- **Response Integrity Verification** — Signed responses prevent MITM tampering
+- **Bot/Automation Detection** — Behavioral analysis blocks suspicious activity
+- **Device Fingerprinting** — Session binding prevents token hijacking
+- **Audit Logging** — Comprehensive security event tracking
+- **Zero Frontend Secrets** — No API keys or sensitive data exposed in frontend
 
 ## Screenshots
 
@@ -41,7 +55,39 @@ Trusted by developers and security researchers for token validation workflows.
   <p><em>Real-time token validation with live results</em></p>
 </div>
 
-## Installation
+---
+
+## Security 🛡️
+
+This application implements **enterprise-grade security architecture** to protect against common web vulnerabilities:
+
+### Threats Protected Against
+| Threat | Protection |
+|--------|-----------|
+| **MITM Attacks** | HTTPS/HSTS enforcement, certificate pinning support |
+| **Request Tampering** | HMAC-SHA256 signatures with constant-time comparison |
+| **Replay Attacks** | Timestamp + nonce-based replay protection |
+| **Frontend Bypass** | Backend-only validation, no frontend business logic |
+| **Automated Abuse** | Multi-layer rate limiting, bot detection, CAPTCHA |
+| **Session Hijacking** | Device fingerprinting, session binding |
+| **Response Tampering** | Response signature verification |
+
+### Security Documentation
+- **[SECURITY_ARCHITECTURE.md](./SECURITY_ARCHITECTURE.md)** — Complete security architecture and design
+- **[BACKEND_IMPLEMENTATION.md](./BACKEND_IMPLEMENTATION.md)** — Backend setup and code examples
+- **[BYPASS_ATTEMPTS.md](./BYPASS_ATTEMPTS.md)** — Common attacks and defenses
+- **[SECURITY_QUICK_REFERENCE.md](./SECURITY_QUICK_REFERENCE.md)** — Quick reference guide
+
+### Key Security Features
+1. **No Secrets in Frontend** — All sensitive operations on backend only
+2. **Cryptographic Request Signing** — Every request verified with HMAC
+3. **Replay Prevention** — Automatic nonce tracking in Redis
+4. **Behavioral Analysis** — Machine learning-based bot detection
+5. **Comprehensive Logging** — Security events logged for audit trails
+6. **Session Rotation** — Keys rotate every 5 minutes
+7. **Rate Limiting** — 10/min per IP, 100/hour per session, 20/min per fingerprint
+
+---## Installation
 
 ### Prerequisites
 
@@ -166,9 +212,9 @@ Join our Discord community for support, feature discussions, and collaboration:
 
 <div align="center">
 
-[![Join our Discord](https://img.shields.io/badge/Join%20our-Discord-7289da?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/YOUR_INVITE_CODE)
+[![Join our Discord](https://img.shields.io/badge/Join%20our-Discord-7289da?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/p6YTYuKpaH)
 
-**[discord.gg/YOUR_INVITE_CODE](https://discord.gg/YOUR_INVITE_CODE)**
+**[https://discord.gg/p6YTYuKpaH](https://discord.gg/p6YTYuKpaH)**
 
 </div>
 
