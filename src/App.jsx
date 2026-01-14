@@ -167,7 +167,7 @@ function App() {
           />
           <div className="buttons">
             <button className="default_button" onClick={check}>Check Tokens</button>
-            <input type="file" id="file" accept=".txt" hidden onChange={handleFile} />
+            <input type="file" id="file" accept=".txt" className="hidden-input" onChange={handleFile} />
             <button className="default_button" onClick={() => document.getElementById('file')?.click()}>
               Load from File
             </button>
