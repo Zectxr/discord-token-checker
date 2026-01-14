@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { maskToken, enforceHTTPS } from './utils/security';
+import { maskToken, enforceHTTPS, validateConnectionSecurity, verifyEnvironmentSecurity, secureFetch } from './utils/security';
 
 function App() {
   const [tokenInput, setTokenInput] = useState('');
@@ -7,6 +7,15 @@ function App() {
   const [results, setResults] = useState([]);
   const [validCount, setValidCount] = useState(0);
   const [invalidCount, setInvalidCount] = useState(0);
+
+  // SECURITY: Verify environment security on app load
+  useEffect(() => {
+    try {
+      verifyEnvironmentSecurity();
+    } catch (error) {
+      console.error('Security verification failed:', error);
+    }
+  }, []);
 
   // SECURITY: Cleanup sensitive data on component unmount
   useEffect(() => {
@@ -61,13 +70,18 @@ function App() {
   const checkSingleToken = async (token) => {
     let response;
     try {
-      // SECURITY: Enforce HTTPS for all API calls
+      // SECURITY: Enforce HTTPS and validate connection for MITM prevention
       const apiUrl = "https://discordapp.com/api/v6/users/@me";
       enforceHTTPS(apiUrl);
+      validateConnectionSecurity(apiUrl);
       
       response = await fetch(apiUrl, {
         method: "GET",
         headers: { Authorization: token },
+        // SECURITY: MITM prevention - strict fetch options
+        mode: 'cors',
+        credentials: 'omit',
+        cache: 'no-store'
       });
       response = await response.json();
     } catch (e) {
@@ -80,13 +94,18 @@ function App() {
 
     let phoneBlockCheck;
     try {
-      // SECURITY: Enforce HTTPS for all API calls
+      // SECURITY: Enforce HTTPS and validate connection for MITM prevention
       const libraryUrl = "https://discordapp.com/api/v6/users/@me/library";
       enforceHTTPS(libraryUrl);
+      validateConnectionSecurity(libraryUrl);
       
       phoneBlockCheck = await fetch(libraryUrl, {
         method: "GET",
         headers: { Authorization: token },
+        // SECURITY: MITM prevention - strict fetch options
+        mode: 'cors',
+        credentials: 'omit',
+        cache: 'no-store'
       });
       phoneBlockCheck = phoneBlockCheck.status;
     } catch (e) {
