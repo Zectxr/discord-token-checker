@@ -1,193 +1,155 @@
 import React, { useState, useEffect } from 'react';
-import { maskToken, enforceHTTPS, validateConnectionSecurity, verifyEnvironmentSecurity, secureFetch } from './utils/security';
+import { maskToken, enforceHTTPS, validateConnectionSecurity, verifyEnvironmentSecurity } from './utils/security';
+
+const DISCORD_API = 'https://discordapp.com/api/v6';
 
 function App() {
-  const [tokenInput, setTokenInput] = useState('');
-  const [hiddenTokens, setHiddenTokens] = useState([]);
+  const [input, setInput] = useState('');
+  const [fileTokens, setFileTokens] = useState([]);
   const [results, setResults] = useState([]);
-  const [validCount, setValidCount] = useState(0);
-  const [invalidCount, setInvalidCount] = useState(0);
+  const [stats, setStats] = useState({ valid: 0, invalid: 0 });
 
-  // SECURITY: Verify environment security on app load
   useEffect(() => {
-    try {
-      verifyEnvironmentSecurity();
-    } catch (error) {
-      console.error('Security verification failed:', error);
-    }
+    verifyEnvironmentSecurity();
   }, []);
 
-  // SECURITY: Cleanup sensitive data on component unmount
   useEffect(() => {
     return () => {
-      // Clear all sensitive state when component unmounts
-      setTokenInput('');
-      setHiddenTokens([]);
+      setInput('');
+      setFileTokens([]);
       setResults([]);
     };
   }, []);
 
-  // SECURITY: Mask token to prevent exposure in DOM
-  const maskToken = (token) => {
-    if (!token || token.length < 10) return '***';
-    // Show first 8 and last 4 characters only
-    return `${token.substring(0, 8)}...${token.substring(token.length - 4)}`;
+  const updateStats = (items) => {
+    const valid = items.filter(r => r.result && !r.result.invalid && !r.result.error).length;
+    const invalid = items.filter(r => r.result && (r.result.invalid || r.result.error)).length;
+    setStats({ valid, invalid });
   };
 
-  const checkTokens = async () => {
-    const tokens = hiddenTokens.length > 0
-      ? hiddenTokens
-      : tokenInput.split('\n').map(t => t.trim()).filter(t => t);
+  const checkToken = async (token) => {
+    try {
+      const url = `${DISCORD_API}/users/@me`;
+      enforceHTTPS(url);
+      validateConnectionSecurity(url);
 
-    if (tokens.length === 0) {
-      setResults([{ type: 'alert', message: 'No tokens provided' }]);
+      const res = await fetch(url, {
+        headers: { Authorization: token },
+        mode: 'cors',
+        credentials: 'omit',
+        cache: 'no-store'
+      });
+
+      if (!res.ok) return { invalid: true };
+      const data = await res.json();
+
+      if (!data.username) return { invalid: true };
+
+      let phoneLocked = 'phone locked';
+      try {
+        const libUrl = `${DISCORD_API}/users/@me/library`;
+        enforceHTTPS(libUrl);
+        validateConnectionSecurity(libUrl);
+
+        const libRes = await fetch(libUrl, {
+          headers: { Authorization: token },
+          mode: 'cors',
+          credentials: 'omit',
+          cache: 'no-store'
+        });
+
+        if (libRes.status === 200) phoneLocked = 'not phone locked';
+      } catch (e) {
+        // library check optional
+      }
+
+      const avatarId = data.avatar || (data.discriminator % 5);
+      const avatarUrl = data.avatar
+        ? `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png?size=256`
+        : `https://cdn.discordapp.com/embed/avatars/${avatarId}.png?size=256`;
+
+      return {
+        tag: `${data.username}#${data.discriminator}`,
+        email: data.email || 'no email',
+        verified: data.verified ? 'Email verified' : 'Email not verified',
+        id: data.id,
+        locale: data.locale,
+        phone: data.phone || 'no phone',
+        phoneLocked,
+        avatar: avatarUrl
+      };
+    } catch (e) {
+      return { error: String(e) };
+    }
+  };
+
+  const check = async () => {
+    const tokens = fileTokens.length > 0
+      ? fileTokens
+      : input.split('\n').map(t => t.trim()).filter(Boolean);
+
+    if (!tokens.length) {
+      setResults([{ type: 'alert', msg: 'No tokens provided' }]);
       return;
     }
-    setResults([]); // Clear previous results
-    setValidCount(0);
-    setInvalidCount(0);
 
-    const newResults = [];
+    setResults([]);
+    setStats({ valid: 0, invalid: 0 });
+
+    const checked = [];
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];
-      const result = await checkSingleToken(token);
-      // SECURITY: Store masked token only, never the real token
-      const maskedToken = maskToken(token);
-      const newResult = { token: maskedToken, result };
-      newResults.push(newResult);
-      setResults([...newResults]); // Update results incrementally
-      updateCounts(newResults); // Update counts after each check
-      
-      // SECURITY: Explicitly overwrite token in memory
+      const result = await checkToken(token);
+      const item = { token: maskToken(token), result };
+      checked.push(item);
+      setResults([...checked]);
+      updateStats(checked);
       tokens[i] = null;
     }
-    
-    // SECURITY: Clear all token references from memory
-    setHiddenTokens([]);
-    setTokenInput('');
+
+    setFileTokens([]);
+    setInput('');
   };
 
-  const checkSingleToken = async (token) => {
-    let response;
-    try {
-      // SECURITY: Enforce HTTPS and validate connection for MITM prevention
-      const apiUrl = "https://discordapp.com/api/v6/users/@me";
-      enforceHTTPS(apiUrl);
-      validateConnectionSecurity(apiUrl);
-      
-      response = await fetch(apiUrl, {
-        method: "GET",
-        headers: { Authorization: token },
-        // SECURITY: MITM prevention - strict fetch options
-        mode: 'cors',
-        credentials: 'omit',
-        cache: 'no-store'
-      });
-      response = await response.json();
-    } catch (e) {
-      return { error: `Request failed: ${e}` };
-    }
+  const handleFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    if (!response.username) {
-      return { invalid: true };
-    }
-
-    let phoneBlockCheck;
-    try {
-      // SECURITY: Enforce HTTPS and validate connection for MITM prevention
-      const libraryUrl = "https://discordapp.com/api/v6/users/@me/library";
-      enforceHTTPS(libraryUrl);
-      validateConnectionSecurity(libraryUrl);
-      
-      phoneBlockCheck = await fetch(libraryUrl, {
-        method: "GET",
-        headers: { Authorization: token },
-        // SECURITY: MITM prevention - strict fetch options
-        mode: 'cors',
-        credentials: 'omit',
-        cache: 'no-store'
-      });
-      phoneBlockCheck = phoneBlockCheck.status;
-    } catch (e) {
-      return { error: `Request failed: ${e}` };
-    }
-
-    switch (phoneBlockCheck) {
-      case 200:
-        phoneBlockCheck = "not phone locked";
-        break;
-      default:
-        phoneBlockCheck = "phone locked";
-        break;
-    }
-
-    return {
-      tag: response.username + "#" + response.discriminator,
-      email: response.email || "no email",
-      verified: response.verified ? "Email verified" : "Email not verified",
-      id: response.id,
-      locale: response.locale,
-      phone: response.phone || "no phone number",
-      phoneblocked: phoneBlockCheck,
-      avatar: response.avatar ? "https://cdn.discordapp.com/avatars/" + response.id + "/" + response.avatar + ".png?size=256" : "https://cdn.discordapp.com/embed/avatars/" + (response.discriminator % 5) + ".png?size=256"
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result || '';
+      const tokens = String(content).split('\n').map(t => t.trim()).filter(Boolean);
+      setFileTokens(tokens);
+      setInput(`${tokens.length} tokens loaded (hidden)`);
+      e.target.value = '';
     };
+    reader.readAsText(file);
   };
 
-  const updateCounts = (res) => {
-    const valid = res.filter(r => r.result && !r.result.invalid && !r.result.error).length;
-    const invalid = res.filter(r => r.result && (r.result.invalid || r.result.error)).length;
-    setValidCount(valid);
-    setInvalidCount(invalid);
+  const copyResult = (data) => {
+    const { token, ...safe } = data;
+    navigator.clipboard.writeText(JSON.stringify(safe, null, 2));
   };
 
-  const loadFile = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const fileContent = e.target.result;
-        const tokens = fileContent.split('\n').map(t => t.trim()).filter(t => t);
-        setHiddenTokens(tokens);
-        setTokenInput(`${tokens.length} tokens loaded from file (hidden for security)`);
-        
-        // SECURITY: Clear file input to prevent re-reading
-        event.target.value = null;
-      };
-      reader.readAsText(file);
-    }
+  const removeResult = (idx) => {
+    const next = results.filter((_, i) => i !== idx);
+    setResults(next);
+    updateStats(next);
   };
 
-  const copySingleResult = (result) => {
-    // SECURITY: Copy result WITHOUT token, only account info
-    const safeCopy = {
-      tag: result.tag,
-      email: result.email,
-      verified: result.verified,
-      id: result.id,
-      locale: result.locale,
-      phone: result.phone,
-      phoneblocked: result.phoneblocked
-    };
-    navigator.clipboard.writeText(JSON.stringify(safeCopy, null, 2));
-  };
-
-  const deleteResult = (index) => {
-    const newResults = results.filter((_, i) => i !== index);
-    setResults(newResults);
-    updateCounts(newResults);
-  };
+  const isError = (r) => r.result?.error || r.result?.invalid;
 
   return (
     <div>
       <header className="app-header">
         <div className="header-left">
           <h1>Account</h1>
-          <p className="subtitle">Manage your connected Discord accounts</p>
+          <p className="subtitle">Check your Discord tokens</p>
         </div>
         <div className="header-right">
           <div className="header-stats">
-            <span className="stat"><strong>{validCount}</strong> Valid</span>
-            <span className="stat"><strong>{invalidCount}</strong> Invalid</span>
+            <span className="stat"><strong>{stats.valid}</strong> Valid</span>
+            <span className="stat"><strong>{stats.invalid}</strong> Invalid</span>
           </div>
         </div>
       </header>
@@ -197,37 +159,39 @@ function App() {
           <textarea
             className="input_main"
             placeholder="Paste tokens here, one per line"
-            value={tokenInput}
+            value={input}
             onChange={(e) => {
-              setTokenInput(e.target.value);
-              setHiddenTokens([]); // Clear hidden tokens when user types
+              setInput(e.target.value);
+              setFileTokens([]);
             }}
           />
           <div className="buttons">
-            <button className="default_button" onClick={checkTokens}>Check Tokens</button>
-            <input type="file" id="fileInput" accept=".txt" style={{ display: 'none' }} onChange={loadFile} />
-            <button className="default_button" onClick={() => document.getElementById('fileInput').click()}>Load from File</button>
+            <button className="default_button" onClick={check}>Check Tokens</button>
+            <input type="file" id="file" accept=".txt" hidden onChange={handleFile} />
+            <button className="default_button" onClick={() => document.getElementById('file')?.click()}>
+              Load from File
+            </button>
           </div>
         </div>
-        <br />
-        <br />
+
         <section className="accounts-area">
           <div className="results">
             {results.length === 0 ? (
-              <div className="no-results">Ready to check tokens...</div>
+              <div className="no-results">Ready to check...</div>
             ) : (
-              results.map((item, index) => {
+              results.map((item, i) => {
                 if (item.type === 'alert') {
-                  return (
-                    <div key={index} className="alert-card">
-                      <span className="alert">{item.message}</span>
-                    </div>
-                  );
+                  return <div key={i} className="alert-card"><span className="alert">{item.msg}</span></div>;
                 }
+
+                const { result } = item;
+                const failed = isError(result);
+
                 return (
-                  <div key={index} className="account-card" data-status={item.result.invalid || item.result.error ? 'invalid' : 'valid'}>
-                    <div className={`status-dot ${item.result.invalid || item.result.error ? 'status-offline' : 'status-online'}`}></div>
-                    {item.result.error ? (
+                  <div key={i} className="account-card" data-status={failed ? 'invalid' : 'valid'}>
+                    <div className={`status-dot ${failed ? 'status-offline' : 'status-online'}`}></div>
+
+                    {result.error ? (
                       <>
                         <div className="account-top">
                           <div className="account-info">
@@ -238,12 +202,12 @@ function App() {
                         <div className="badges">
                           <span className="badge status">Error</span>
                         </div>
-                        <span className="alert">{item.result.error}</span>
+                        <span className="alert">{result.error}</span>
                       </>
-                    ) : item.result.invalid ? (
+                    ) : result.invalid ? (
                       <>
                         <div className="account-top">
-                          <img className="account-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png?size=256" />
+                          <img className="account-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png?size=256" alt="" />
                           <div className="account-info">
                             <div className="account-username">Invalid Token</div>
                             <div className="account-sub">{item.token}</div>
@@ -257,10 +221,10 @@ function App() {
                     ) : (
                       <>
                         <div className="account-top">
-                          <img className="account-avatar" src={item.result.avatar} />
+                          <img className="account-avatar" src={result.avatar} alt="" />
                           <div className="account-info">
-                            <div className="account-username">{item.result.tag}</div>
-                            <div className="account-sub">{item.result.id}</div>
+                            <div className="account-username">{result.tag}</div>
+                            <div className="account-sub">{result.id}</div>
                           </div>
                         </div>
                         <div className="badges">
@@ -268,15 +232,15 @@ function App() {
                           <span className="badge valid">Valid</span>
                         </div>
                         <ul className="list_group">
-                          <li className="list_item token"><strong>Token:</strong> <span className="list_value">{item.token}</span></li>
-                          <li className="list_item"><strong>Email:</strong> <span className="list_value">{item.result.email}</span></li>
-                          <li className="list_item"><strong>Verified:</strong> <span className="list_value">{item.result.verified}</span></li>
-                          <li className="list_item"><strong>Locale:</strong> <span className="list_value">{item.result.locale}</span></li>
-                          <li className="list_item"><strong>Phone:</strong> <span className="list_value">{item.result.phone}</span></li>
+                          <li className="list_item"><strong>Token:</strong> <span>{item.token}</span></li>
+                          <li className="list_item"><strong>Email:</strong> <span>{result.email}</span></li>
+                          <li className="list_item"><strong>Verified:</strong> <span>{result.verified}</span></li>
+                          <li className="list_item"><strong>Locale:</strong> <span>{result.locale}</span></li>
+                          <li className="list_item"><strong>Phone:</strong> <span>{result.phone}</span></li>
                         </ul>
                         <div className="card-buttons">
-                          <button className="default_button" onClick={() => copySingleResult(item.result)}>Copy</button>
-                          <button className="delete-btn" title="Remove" onClick={() => deleteResult(index)}>🗑️</button>
+                          <button className="default_button" onClick={() => copyResult(result)}>Copy</button>
+                          <button className="delete-btn" title="Remove" onClick={() => removeResult(i)}>🗑️</button>
                         </div>
                       </>
                     )}
