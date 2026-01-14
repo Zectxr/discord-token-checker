@@ -25,11 +25,13 @@ Trusted by developers and security researchers for token validation workflows.
 
 ## Features
 
+- **🔒 Enterprise Security** — Tokens never stored on disk, memory-only processing, HTTPS-enforced (see [SECURITY.md](SECURITY.md))
 - **Instant Token Validation** — Verify Discord tokens against the official API in real-time
 - **Comprehensive Account Details** — View username, email, verification status, phone lock status, ID, locale, and avatar
 - **Batch Processing** — Check multiple tokens simultaneously with live progress updates
 - **Secure File Upload** — Load tokens from `.txt` files without exposing them in the UI
 - **Zero Data Storage** — All processing happens client-side; no tokens are stored or transmitted to external servers
+- **Token Masking** — Tokens are masked in the UI to prevent accidental exposure or scraping
 - **Modern Interface** — Clean, responsive design built for efficiency and usability
 - **One-Click Actions** — Copy account data or remove results with single-click controls
 - **Lightning Fast** — Powered by Vite for instant hot module replacement and optimized builds

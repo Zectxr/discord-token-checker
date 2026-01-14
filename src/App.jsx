@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { securityDetection } from './utils/securityDetection';
-import { crypto } from './utils/cryptoUtilities';
-import { runtimeIntegrity, behaviorAnalysis } from './utils/runtimeIntegrity';
-import { securityConfig, SecureFetch, SecurityMiddleware } from './utils/securityConfig';
+import { maskToken, enforceHTTPS } from './utils/security';
 
 function App() {
   const [tokenInput, setTokenInput] = useState('');
@@ -10,52 +7,23 @@ function App() {
   const [results, setResults] = useState([]);
   const [validCount, setValidCount] = useState(0);
   const [invalidCount, setInvalidCount] = useState(0);
-  const [securityWarning, setSecurityWarning] = useState(null);
-  const [secureFetch] = useState(() => new SecureFetch(new SecurityMiddleware()));
 
-  // Initialize security on mount
+  // SECURITY: Cleanup sensitive data on component unmount
   useEffect(() => {
-    const initSecurity = async () => {
-      // Initialize runtime protection
-      runtimeIntegrity.initialize();
-      behaviorAnalysis.startMonitoring();
-
-      // Run security audit
-      const audit = securityDetection.runFullSecurityAudit();
-      const report = securityDetection.getSecurityReport(audit);
-
-      // Log audit results
-      console.log('[Security Audit]', report);
-
-      // Check if suspicious (only in production)
-      const isProduction = process.env.NODE_ENV === 'production';
-      if (audit.flagged && isProduction) {
-        setSecurityWarning({
-          level: 'warning',
-          message: 'Suspicious environment detected. Some features may be restricted.',
-          details: audit.checks,
-        });
-        
-        if (securityConfig.behavior.logViolations) {
-          console.warn('Security violations detected:', audit);
-        }
-      } else if (securityConfig.development.logAllDetections) {
-        console.debug('[Dev Mode] Security audit details logged above');
-      }
-
-      // Enforce HTTPS in production
-      if (!securityConfig.development.allowLocalhost && window.location.protocol !== 'https:') {
-        console.warn('Non-HTTPS connection detected');
-      }
-    };
-
-    initSecurity();
-
-    // Cleanup
     return () => {
-      runtimeIntegrity.shutdown();
+      // Clear all sensitive state when component unmounts
+      setTokenInput('');
+      setHiddenTokens([]);
+      setResults([]);
     };
   }, []);
+
+  // SECURITY: Mask token to prevent exposure in DOM
+  const maskToken = (token) => {
+    if (!token || token.length < 10) return '***';
+    // Show first 8 and last 4 characters only
+    return `${token.substring(0, 8)}...${token.substring(token.length - 4)}`;
+  };
 
   const checkTokens = async () => {
     const tokens = hiddenTokens.length > 0
@@ -71,32 +39,35 @@ function App() {
     setInvalidCount(0);
 
     const newResults = [];
-    for (let token of tokens) {
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
       const result = await checkSingleToken(token);
-      const newResult = { token, result };
+      // SECURITY: Store masked token only, never the real token
+      const maskedToken = maskToken(token);
+      const newResult = { token: maskedToken, result };
       newResults.push(newResult);
       setResults([...newResults]); // Update results incrementally
       updateCounts(newResults); // Update counts after each check
+      
+      // SECURITY: Explicitly overwrite token in memory
+      tokens[i] = null;
     }
-    // Clear hidden tokens after checking
+    
+    // SECURITY: Clear all token references from memory
     setHiddenTokens([]);
     setTokenInput('');
   };
 
   const checkSingleToken = async (token) => {
-    // Rate limiting: add random delay to prevent rapid automation
-    await new Promise(resolve => 
-      setTimeout(resolve, Math.random() * 500 + 100)
-    );
-
     let response;
     try {
-      // Discord API CORS restrictions - minimal headers needed
-      response = await fetch("https://discord.com/api/v10/users/@me", {
+      // SECURITY: Enforce HTTPS for all API calls
+      const apiUrl = "https://discordapp.com/api/v6/users/@me";
+      enforceHTTPS(apiUrl);
+      
+      response = await fetch(apiUrl, {
         method: "GET",
-        headers: { 
-          Authorization: token,
-        },
+        headers: { Authorization: token },
       });
       response = await response.json();
     } catch (e) {
@@ -109,11 +80,13 @@ function App() {
 
     let phoneBlockCheck;
     try {
-      phoneBlockCheck = await fetch("https://discord.com/api/v10/users/@me/library", {
+      // SECURITY: Enforce HTTPS for all API calls
+      const libraryUrl = "https://discordapp.com/api/v6/users/@me/library";
+      enforceHTTPS(libraryUrl);
+      
+      phoneBlockCheck = await fetch(libraryUrl, {
         method: "GET",
-        headers: { 
-          Authorization: token,
-        },
+        headers: { Authorization: token },
       });
       phoneBlockCheck = phoneBlockCheck.status;
     } catch (e) {
@@ -157,13 +130,26 @@ function App() {
         const tokens = fileContent.split('\n').map(t => t.trim()).filter(t => t);
         setHiddenTokens(tokens);
         setTokenInput(`${tokens.length} tokens loaded from file (hidden for security)`);
+        
+        // SECURITY: Clear file input to prevent re-reading
+        event.target.value = null;
       };
       reader.readAsText(file);
     }
   };
 
   const copySingleResult = (result) => {
-    navigator.clipboard.writeText(JSON.stringify(result));
+    // SECURITY: Copy result WITHOUT token, only account info
+    const safeCopy = {
+      tag: result.tag,
+      email: result.email,
+      verified: result.verified,
+      id: result.id,
+      locale: result.locale,
+      phone: result.phone,
+      phoneblocked: result.phoneblocked
+    };
+    navigator.clipboard.writeText(JSON.stringify(safeCopy, null, 2));
   };
 
   const deleteResult = (index) => {
@@ -174,24 +160,6 @@ function App() {
 
   return (
     <div>
-      {securityWarning && (
-        <div className="security-warning" style={{
-          backgroundColor: '#fff3cd',
-          border: '1px solid #ffc107',
-          padding: '12px',
-          margin: '10px 0',
-          borderRadius: '4px',
-          color: '#856404',
-        }}>
-          <strong>⚠️ Security Notice:</strong> {securityWarning.message}
-          <details style={{ fontSize: '0.9em', marginTop: '8px' }}>
-            <summary>Details</summary>
-            <pre style={{ fontSize: '0.85em', overflow: 'auto' }}>
-              {JSON.stringify(securityWarning.details, null, 2)}
-            </pre>
-          </details>
-        </div>
-      )}
       <header className="app-header">
         <div className="header-left">
           <h1>Account</h1>

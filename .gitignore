@@ -28,6 +28,11 @@ Thumbs.db
 # Sensitive files
 tokens.txt
 *.token
+*.tokens
+accounts.txt
+credentials.txt
+secrets.txt
+*.log
 *.key
 
 # Logs
