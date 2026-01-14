@@ -232,7 +232,7 @@ function App() {
                           <span className="badge valid">Valid</span>
                         </div>
                         <ul className="list_group">
-                          <li className="list_item"><strong>Token:</strong> <span>{item.token}</span></li>
+                          <li className="list_item"><strong>Token:</strong> <code className="token-code">{item.token}</code></li>
                           <li className="list_item"><strong>Email:</strong> <span>{result.email}</span></li>
                           <li className="list_item"><strong>Verified:</strong> <span>{result.verified}</span></li>
                           <li className="list_item"><strong>Locale:</strong> <span>{result.locale}</span></li>
