@@ -8,6 +8,7 @@ function App() {
   const [fileTokens, setFileTokens] = useState([]);
   const [results, setResults] = useState([]);
   const [stats, setStats] = useState({ valid: 0, invalid: 0 });
+  const [visibility, setVisibility] = useState({});
 
   useEffect(() => {
     verifyEnvironmentSecurity();
@@ -139,6 +140,17 @@ function App() {
 
   const isError = (r) => r.result?.error || r.result?.invalid;
 
+  const toggleVisibility = (idx, field) => {
+    setVisibility(prev => ({
+      ...prev,
+      [`${idx}-${field}`]: !prev[`${idx}-${field}`]
+    }));
+  };
+
+  const isVisible = (idx, field) => visibility[`${idx}-${field}`] || false;
+
+  const maskValue = (value) => '•'.repeat(value?.length || 8);
+
   return (
     <div>
       <header className="app-header">
@@ -233,10 +245,26 @@ function App() {
                         </div>
                         <ul className="list_group">
                           <li className="list_item"><strong>Token:</strong> <code className="token-code">{item.token}</code></li>
-                          <li className="list_item"><strong>Email:</strong> <span>{result.email}</span></li>
+                          <li className="list_item">
+                            <strong>Email:</strong> 
+                            <span className="sensitive-field">
+                              {isVisible(i, 'email') ? result.email : maskValue(result.email)}
+                              <button className="eye-btn" onClick={() => toggleVisibility(i, 'email')}>
+                                {isVisible(i, 'email') ? '👁️' : '👁️‍🗨️'}
+                              </button>
+                            </span>
+                          </li>
                           <li className="list_item"><strong>Verified:</strong> <span>{result.verified}</span></li>
                           <li className="list_item"><strong>Locale:</strong> <span>{result.locale}</span></li>
-                          <li className="list_item"><strong>Phone:</strong> <span>{result.phone}</span></li>
+                          <li className="list_item">
+                            <strong>Phone:</strong> 
+                            <span className="sensitive-field">
+                              {isVisible(i, 'phone') ? result.phone : maskValue(result.phone)}
+                              <button className="eye-btn" onClick={() => toggleVisibility(i, 'phone')}>
+                                {isVisible(i, 'phone') ? '👁️' : '👁️‍🗨️'}
+                              </button>
+                            </span>
+                          </li>
                         </ul>
                         <div className="card-buttons">
                           <button className="default_button" onClick={() => copyResult(result)}>Copy</button>
